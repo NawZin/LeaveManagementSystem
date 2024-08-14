@@ -3,10 +3,10 @@ using LeaveManagementSystem.Web.Data;
 using LeaveManagementSystem.Web.Models.LeaveTypes;
 using Microsoft.EntityFrameworkCore;
 
-namespace LeaveManagementSystem.Web.Services
+namespace LeaveManagementSystem.Web.Services.LeaveTypes
 {
     public class LeaveTypesService(ApplicationDbContext _context, IMapper _mapper) : ILeaveTypesService
-    {       
+    {
         public async Task<List<LeaveTypeReadOnlyVM>> GetAll()
         {
             var data = await _context.LeaveTypes.ToListAsync();
@@ -53,6 +53,7 @@ namespace LeaveManagementSystem.Web.Services
             return _context.LeaveTypes.Any(e => e.Id == id);
         }
 
+
         public async Task<bool> CheckIfLeaveTypeExists(string name)
         {
             var lowercaseName = name.ToLower();
@@ -64,6 +65,12 @@ namespace LeaveManagementSystem.Web.Services
             var lowercaseName = leaveTypeEdit.Name.ToLower();
             return await _context.LeaveTypes.AnyAsync(t => t.Name.ToLower().Equals(lowercaseName)
             && !t.Id.Equals(leaveTypeEdit.Id));
+        }
+
+        public async Task<bool> DaysExceedMaximum(int leaveTypeId, int days)
+        {
+            var leaveType = await _context.LeaveTypes.FindAsync(leaveTypeId);
+            return leaveType.NumberOfDays < days;
         }
     }
 }
